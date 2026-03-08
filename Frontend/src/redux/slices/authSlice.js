@@ -11,7 +11,7 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
         credentials: "include",
       });
       if (!res.ok) throw new Error("Not authenticated");
