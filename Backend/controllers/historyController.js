@@ -15,23 +15,34 @@ const getHistory = async (req, res) => {
 }
 
 // POST /api/history
+// POST /api/history
 const addToHistory = async (req, res) => {
-  const { movieId, title, poster, mediaType } = req.body
+  const { movieId, title, poster, mediaType } = req.body;
+
   try {
-    // Remove old entry if exists, then re-add (keep it fresh at the top)
-    await WatchHistory.findOneAndDelete({ userId: req.user._id, movieId })
-    const entry = await WatchHistory.create({
-      userId: req.user._id,
-      movieId,
-      title,
-      poster,
-      mediaType,
-    })
-    res.status(201).json(entry)
+    const entry = await WatchHistory.findOneAndUpdate(
+      {
+        userId: req.user._id,
+        movieId: movieId,
+      },
+      {
+        title,
+        poster,
+        mediaType,
+        watchedAt: new Date(),
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
+
+    res.status(200).json(entry);
+
   } catch (error) {
-    res.status(500).json({ message: error.message })
+    res.status(500).json({ message: error.message });
   }
-}
+};
 
 export { 
     getHistory, 

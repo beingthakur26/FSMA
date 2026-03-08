@@ -12,6 +12,7 @@ import movieRoutes from './routes/movieRoutes.js'
 import favoriteRoutes from './routes/favoriteRoutes.js'
 import historyRoutes from './routes/historyRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
+import watchlistRoutes from './routes/watchlistRoutes.js';
 
 dotenv.config()
 connectDB()
@@ -33,6 +34,7 @@ app.use('/api/movies', movieRoutes)
 app.use('/api/favorites', favoriteRoutes)
 app.use('/api/history', historyRoutes)
 app.use('/api/admin', adminRoutes)
+app.use('/api/watchlist', watchlistRoutes);
 
 app.get('/', (req, res) => res.send('FSMA API Running'))
 

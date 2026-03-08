@@ -26,7 +26,16 @@ const userSchema = new mongoose.Schema({
     isBanned: {
         type: Boolean,
         default: false
-    }
+    },
+    watchlist: [
+        {
+            movieId:    { type: String, required: true },   // TMDB id
+            title:      { type: String },
+            poster:     { type: String },
+            mediaType:  { type: String, enum: ['movie', 'tv'], default: 'movie' },
+            addedAt:    { type: Date, default: Date.now },
+        }
+    ],
 }, { timestamps: true })
 
 // Hash passsword befor saving it
@@ -38,11 +47,6 @@ userSchema.pre("save", async function() {
   this.password = await bcrypt.hash(this.password, salt)
 
 })
-
-// Compare password
-// userSchema.methods.comparePassword = async function (enteredPassword) {
-//     return await bcrypt.compare(enteredPassword, this.password)
-// }
 
 // COMPARE PASSWORD
 userSchema.methods.comparePassword = async function (enteredPassword) {

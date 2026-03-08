@@ -18,7 +18,9 @@ const banUser = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' })
     user.isBanned = !user.isBanned
     await user.save()
-    res.json({ message: `User ${user.isBanned ? 'banned' : 'unbanned'}`, isBanned: user.isBanned })
+    // FIX: return full user (minus password) so Redux can update state correctly
+    const updated = await User.findById(user._id).select('-password')
+    res.json(updated)
   } catch (error) {
     res.status(500).json({ message: error.message })
   }
@@ -74,12 +76,44 @@ const deleteMovie = async (req, res) => {
   }
 }
 
-export { 
-    getAllUsers, 
-    banUser, 
-    deleteUser, 
-    getAllMovies, 
-    createMovie, 
-    updateMovie, 
-    deleteMovie 
+// GET /api/admin/stats  ← NEW: was completely missing
+const getStats = async (req, res) => {
+  try {
+    const [totalUsers, totalMovies, bannedUsers] = await Promise.all([
+      User.countDocuments(),
+      Movie.countDocuments(),
+      User.countDocuments({ isBanned: true }),
+    ])
+
+    // totalFavorites / totalHistory — aggregate across all users
+    const favAgg = await User.aggregate([
+      { $project: { favCount: { $size: { $ifNull: ["$favorites", []] } } } },
+      { $group: { _id: null, total: { $sum: "$favCount" } } },
+    ])
+    const histAgg = await User.aggregate([
+      { $project: { histCount: { $size: { $ifNull: ["$watchHistory", []] } } } },
+      { $group: { _id: null, total: { $sum: "$histCount" } } },
+    ])
+
+    res.json({
+      totalUsers,
+      totalMovies,
+      bannedUsers,
+      totalFavorites: favAgg[0]?.total ?? 0,
+      totalHistory: histAgg[0]?.total ?? 0,
+    })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+export {
+  getAllUsers,
+  banUser,
+  deleteUser,
+  getAllMovies,
+  createMovie,
+  updateMovie,
+  deleteMovie,
+  getStats,  // ← export the new one
 }
