@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginUser, registerUser, logoutUser, getUserProfile, updateUserProfile } from "../../services/authService";
 // ↑ FIX: getUserProfile and updateUserProfile were never imported — caused "Update failed" silently
