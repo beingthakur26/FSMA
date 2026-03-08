@@ -1,30 +1,21 @@
 import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
 
-
 // TOKEN GENERATOR
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
-
 // POST /api/auth/signup
 const signup = async (req, res) => {
-
   const { name, email, password } = req.body
-
   try {
-
     const userExists = await User.findOne({ email })
-
     if (userExists) {
       return res.status(400).json({ message: 'Email already registered' })
     }
 
     const user = await User.create({ name, email, password })
-
-    const token = generateToken(user._id)   // (ADDED)
-
-    res.cookie("token", token, cookieOptions)  // (ADDED)
+    const token = generateToken(user._id)
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -33,28 +24,21 @@ const signup = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(201).json({                     // (MODIFIED)
+    res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
     })
-
   } catch (error) {
-
     res.status(500).json({ message: error.message })
-
   }
 }
 
-
 // POST /api/auth/login
 const login = async (req, res) => {
-
   const { email, password } = req.body
-
   try {
-
     const user = await User.findOne({ email })
 
     if (!user || !(await user.comparePassword(password))) {
@@ -65,9 +49,7 @@ const login = async (req, res) => {
       return res.status(403).json({ message: 'Account banned' })
     }
 
-    const token = generateToken(user._id)  // (ADDED)
-
-    res.cookie("token", token, cookieOptions)  // (ADDED)
+    const token = generateToken(user._id)
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -76,21 +58,16 @@ const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-
-    res.json({                                // (MODIFIED)
+    res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role
     })
-
   } catch (error) {
-
     res.status(500).json({ message: error.message })
-
   }
 }
-
 
 // GET /api/auth/me
 const getMe = async (req, res) => {
@@ -99,14 +76,12 @@ const getMe = async (req, res) => {
 
 // POST /api/auth/logout
 const logout = (req, res) => {
-  res.clearCookie('token')
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  })
   res.json({ message: 'Logged out' })
 }
 
-
-export {
-  signup,
-  login,
-  getMe,
-  logout
-}
+export { signup, login, getMe, logout }
