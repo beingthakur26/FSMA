@@ -46,5 +46,19 @@ export const getMoviesByGenre = (genreId, page = 1) =>
 export const getTVByGenre = (genreId, page = 1) =>
   tmdb.get("/discover/tv", { params: { with_genres: genreId, page } });
 
+export const getPopularPeople = (page = 1) =>
+  tmdb.get("/person/popular", { params: { page } });
+
+export const getPersonDetails = (id) =>
+  tmdb.get(`/person/${id}`);
+
+export const getPersonMovieCredits = (id) =>
+  tmdb.get(`/person/${id}/movie_credits`);
+
+export const getPersonTVCredits = (id) =>
+  tmdb.get(`/person/${id}/tv_credits`);
+
+export const TMDB_PROFILE_BASE = "https://image.tmdb.org/t/p/w185";
+
 export const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w500";
 export const TMDB_BACKDROP_BASE = "https://image.tmdb.org/t/p/original";

@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, registerUser, logoutUser } from "../../services/authService";
+import { loginUser, registerUser, logoutUser, getUserProfile, updateUserProfile } from "../../services/authService";
+// ↑ FIX: getUserProfile and updateUserProfile were never imported — caused "Update failed" silently
 
 const getErrorMessage = (err, defaultMessage) => {
   return err?.response?.data?.message || err?.message || defaultMessage;
@@ -57,76 +58,67 @@ export const logout = createAsyncThunk(
   }
 );
 
+export const fetchProfile = createAsyncThunk(
+  "auth/fetchProfile",
+  async (_, thunkAPI) => {
+    try {
+      return await getUserProfile();
+    } catch (err) {
+      return thunkAPI.rejectWithValue("Failed to fetch profile");
+    }
+  }
+);
+
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (userData, thunkAPI) => {
+    try {
+      return await updateUserProfile(userData);
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err?.response?.data?.message || "Update failed");
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
-
   initialState: {
     user: null,
     loading: false,
     error: null,
-    isInitialized: false, // ← NEW: false until checkAuth resolves
+    isInitialized: false,
   },
-
   reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
+    clearError: (state) => { state.error = null; },
   },
-
   extraReducers: (builder) => {
     builder
-
       // CHECK AUTH
-      .addCase(checkAuth.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(checkAuth.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.isInitialized = true; // ← user is logged in
-      })
-      .addCase(checkAuth.rejected, (state) => {
-        state.loading = false;
-        state.user = null;
-        state.isInitialized = true; // ← no session, but we now know that for sure
-      })
+      .addCase(checkAuth.pending,    (state) => { state.loading = true; })
+      .addCase(checkAuth.fulfilled,  (state, action) => { state.loading = false; state.user = action.payload; state.isInitialized = true; })
+      .addCase(checkAuth.rejected,   (state) => { state.loading = false; state.user = null; state.isInitialized = true; })
 
       // LOGIN
-      .addCase(login.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(login.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(login.pending,   (state) => { state.loading = true; state.error = null; })
+      .addCase(login.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+      .addCase(login.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
       // REGISTER
-      .addCase(register.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(register.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-      })
-      .addCase(register.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+      .addCase(register.pending,   (state) => { state.loading = true; state.error = null; })
+      .addCase(register.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+      .addCase(register.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
 
       // LOGOUT
-      .addCase(logout.fulfilled, (state) => {
-        state.user = null;
-        state.error = null;
-      })
-      .addCase(logout.rejected, (state, action) => {
-        state.error = action.payload;
-      });
+      .addCase(logout.fulfilled, (state) => { state.user = null; state.error = null; })
+      .addCase(logout.rejected,  (state, action) => { state.error = action.payload; })
+
+      // FETCH PROFILE
+      .addCase(fetchProfile.fulfilled, (state, action) => { state.user = action.payload; })
+
+      // UPDATE PROFILE
+      .addCase(updateProfile.pending,   (state) => { state.loading = true; state.error = null; })
+      .addCase(updateProfile.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
+      .addCase(updateProfile.rejected,  (state, action) => { state.loading = false; state.error = action.payload; });
   },
 });
 

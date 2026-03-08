@@ -16,3 +16,13 @@ export const loginUser = async (credentials) => {
 export const logoutUser = async () => {
   await api.post("/api/auth/logout");
 };
+
+export const getUserProfile = async () => {
+  const res = await api.get("/api/auth/profile");
+  return res.data;
+};
+
+export const updateUserProfile = async (data) => {
+  const res = await api.put("/api/auth/profile", data);
+  return res.data;
+};

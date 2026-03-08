@@ -13,7 +13,14 @@ export default function Login() {
   useEffect(() => {
     if (user) navigate("/");
     return () => dispatch(clearError());
-  }, [user]);
+  }, [user, navigate, dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === "admin" ? "/admin" : "/");
+    }
+    return () => dispatch(clearError());
+  }, [user, navigate, dispatch]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });

@@ -13,6 +13,7 @@ import favoriteRoutes from './routes/favoriteRoutes.js'
 import historyRoutes from './routes/historyRoutes.js'
 import adminRoutes from './routes/adminRoutes.js'
 import watchlistRoutes from './routes/watchlistRoutes.js';
+import profileRoutes from "./routes/profileRoutes.js";
 
 dotenv.config()
 connectDB()
@@ -20,10 +21,26 @@ connectDB()
 const app = express()
 
 // ✅ CORS configuration
+// app.use(cors({
+//   origin: process.env.CLIENT_URL,
+//   credentials: true
+// }))
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL, // will set this after frontend deploys
+];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true
-}))
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 
 app.use(express.json())
 
@@ -35,6 +52,7 @@ app.use('/api/favorites', favoriteRoutes)
 app.use('/api/history', historyRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/watchlist', watchlistRoutes);
+app.use("/api/auth", profileRoutes);
 
 app.get('/', (req, res) => res.send('FSMA API Running'))
 

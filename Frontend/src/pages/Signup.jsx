@@ -13,7 +13,7 @@ export default function Signup() {
   useEffect(() => {
     if (user) navigate("/");
     return () => dispatch(clearError());
-  }, [user]);
+  }, [user, navigate, dispatch]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });

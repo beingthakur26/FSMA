@@ -22,12 +22,16 @@ import { useEffect } from "react";           // ← add
 import { useDispatch } from "react-redux";   // ← add
 import { checkAuth } from "./redux/slices/authSlice";  // ← add
 import Watchlist from "./pages/Watchlist";
+import Footer from "./components/common/Footer";
+import People from "./pages/People";
+import Profile from "./pages/Profile";
 
 function WithNavbar({ children }) {
   return (
     <>
       <Navbar />
       {children}
+      <Footer />
     </>
   );
 }
@@ -55,6 +59,8 @@ export default function App() {
       <Route path="/favorites" element={<WithNavbar><ProtectedRoute><Favorites /></ProtectedRoute></WithNavbar>} />
       <Route path="/history" element={<WithNavbar><ProtectedRoute><WatchHistory /></ProtectedRoute></WithNavbar>} />
       <Route path="/watchlist" element={<WithNavbar><ProtectedRoute><Watchlist /></ProtectedRoute></WithNavbar>} />
+      <Route path="/people" element={<WithNavbar><ProtectedRoute><People /></ProtectedRoute></WithNavbar>} />
+      <Route path="/profile" element={<WithNavbar><ProtectedRoute><Profile /></ProtectedRoute></WithNavbar>} />
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminRoute><AdminLayout><Dashboard /></AdminLayout></AdminRoute>} />
