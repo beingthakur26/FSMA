@@ -28,7 +28,8 @@ const app = express()
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.FRONTEND_URL, // will set this after frontend deploys
+  "https://fsma-frontend.onrender.com",  // ← add your exact frontend URL
+  process.env.FRONTEND_URL,
 ];
 
 app.use(cors({
