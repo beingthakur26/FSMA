@@ -7,15 +7,6 @@ const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
 
-// COOKIE OPTIONS  (ADDED)
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,           // ← required for HTTPS
-  sameSite: "none",       // ← required for cross-domain cookies
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
-
-
 // POST /api/auth/signup
 const signup = async (req, res) => {
 
@@ -34,6 +25,13 @@ const signup = async (req, res) => {
     const token = generateToken(user._id)   // (ADDED)
 
     res.cookie("token", token, cookieOptions)  // (ADDED)
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.status(201).json({                     // (MODIFIED)
       _id: user._id,
@@ -70,6 +68,14 @@ const login = async (req, res) => {
     const token = generateToken(user._id)  // (ADDED)
 
     res.cookie("token", token, cookieOptions)  // (ADDED)
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
 
     res.json({                                // (MODIFIED)
       _id: user._id,
